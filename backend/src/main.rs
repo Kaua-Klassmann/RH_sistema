@@ -3,6 +3,8 @@ use tokio::net::TcpListener;
 mod app;
 mod configs;
 mod connections;
+mod entities;
+mod handlers;
 mod jwt;
 mod routes;
 mod state;
