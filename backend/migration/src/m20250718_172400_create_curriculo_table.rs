@@ -37,7 +37,7 @@ impl MigrationTrait for Migration {
                             .default(false),
                     )
                     .col(ColumnDef::new(Curriculo::Anexo).string())
-                    .col(ColumnDef::new(Curriculo::Observação).text())
+                    .col(ColumnDef::new(Curriculo::Observação).text().not_null())
                     .to_owned(),
             )
             .await
