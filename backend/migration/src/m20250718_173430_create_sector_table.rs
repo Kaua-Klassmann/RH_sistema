@@ -9,15 +9,15 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Setor::Table)
+                    .table(Sector::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Setor::Id)
+                        ColumnDef::new(Sector::Id)
                             .unsigned()
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Setor::Nome).string_len(20).not_null())
+                    .col(ColumnDef::new(Sector::Name).string_len(30).not_null())
                     .to_owned(),
             )
             .await?;
@@ -25,8 +25,8 @@ impl MigrationTrait for Migration {
         manager
             .exec_stmt(
                 Query::insert()
-                    .into_table(Setor::Table)
-                    .columns([Setor::Nome])
+                    .into_table(Sector::Table)
+                    .columns([Sector::Name])
                     .values_panic(["Acabamento".into()])
                     .values_panic(["Administrativo".into()])
                     .values_panic(["Comercial".into()])
@@ -44,14 +44,14 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(Setor::Table).to_owned())
+            .drop_table(Table::drop().table(Sector::Table).to_owned())
             .await
     }
 }
 
 #[derive(DeriveIden)]
-pub enum Setor {
+pub enum Sector {
     Table,
     Id,
-    Nome,
+    Name,
 }
