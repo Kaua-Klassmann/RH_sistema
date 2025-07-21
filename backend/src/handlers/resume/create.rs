@@ -1,4 +1,5 @@
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use chrono::{Days, Utc};
 use sea_orm::{
     ActiveValue::{NotSet, Set},
     ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter,
@@ -39,6 +40,22 @@ pub async fn create(
                 "error": "Estrutura inválida"
             })),
         );
+    }
+
+    if payload.interview_date.is_some() {
+        let now = Utc::now()
+            .naive_utc()
+            .checked_sub_days(Days::new(1))
+            .unwrap();
+
+        if now.gt(&payload.interview_date.unwrap()) {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({
+                    "error": "Falha ao atualizar com data já passada"
+                })),
+            );
+        }
     }
 
     let db = &*state.db_conn;

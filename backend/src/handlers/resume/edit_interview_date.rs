@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
+use chrono::{Days, Utc};
 use sea_orm::{
     ActiveModelTrait, ActiveValue::Set, EntityTrait, IntoActiveModel, prelude::DateTime,
 };
@@ -23,6 +24,20 @@ pub async fn edit_interview_date(
     Path(resume_id): Path<u32>,
     Json(payload): Json<Payload>,
 ) -> impl IntoResponse {
+    let now = Utc::now()
+        .naive_utc()
+        .checked_sub_days(Days::new(1))
+        .unwrap();
+
+    if now.gt(&payload.interview_date) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({
+                "error": "Falha ao atualizar com data já passada"
+            })),
+        );
+    }
+
     let db = &*state.db_conn;
 
     let Ok(resume_option) = resume::Entity::find_by_id(resume_id).one(db).await else {
