@@ -1,10 +1,11 @@
-use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
-use chrono::{Days, Utc};
-use sea_orm::{
-    ActiveValue::{NotSet, Set},
-    ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter,
-    prelude::DateTime,
+use axum::{
+    Json,
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
 };
+use chrono::{Days, Utc};
+use sea_orm::{ActiveValue::Set, EntityTrait, prelude::DateTime};
 use serde::Deserialize;
 use serde_json::json;
 use validator::Validate;
@@ -21,13 +22,15 @@ pub struct Payload {
     phone: String,
     #[validate(range(min = 1))]
     id_sector: u32,
+    hired: bool,
     interview_date: Option<DateTime>,
     observation: String,
 }
 
-pub async fn create(
+pub async fn edit(
     State(state): State<AppState>,
     _: JwtClaims,
+    Path(resume_id): Path<u32>,
     Json(payload): Json<Payload>,
 ) -> impl IntoResponse {
     if payload.validate().is_err()
@@ -52,7 +55,7 @@ pub async fn create(
             return (
                 StatusCode::BAD_REQUEST,
                 Json(json!({
-                    "error": "Falha ao cadastrar com data já passada"
+                    "error": "Falha ao atualizar com data já passada"
                 })),
             );
         }
@@ -60,53 +63,44 @@ pub async fn create(
 
     let db = &*state.db_conn;
 
-    let Ok(resume_exists) = resume::Entity::find()
-        .filter(resume::Column::Cpf.eq(&payload.cpf))
-        .count(db)
-        .await
-    else {
+    let Ok(resume_option) = resume::Entity::find_by_id(resume_id).one(db).await else {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({
-                "error": "Falha ao validar usuário"
+                "error": "Falha ao procurar usuário"
             })),
         );
     };
 
-    if resume_exists != 0 {
+    if resume_option.is_none() {
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({
-                "error": "Usuário já cadastrado no sistema"
+                "error": "Usuário não cadastrado no sistema"
             })),
         );
-    }
+    };
 
     let resume = resume::ActiveModel {
-        id: NotSet,
+        id: Set(resume_id),
         name: Set(payload.name),
         cpf: Set(payload.cpf),
         phone: Set(payload.phone),
+        hired: Set(payload.hired),
         id_sector: Set(payload.id_sector),
         interview_date: Set(payload.interview_date),
-        hired: NotSet,
-        attachment: NotSet,
         observation: Set(payload.observation),
+        ..Default::default()
     };
 
-    let Ok(create_resume_result) = resume::Entity::insert(resume).exec(db).await else {
+    if resume::Entity::update(resume).exec(db).await.is_err() {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({
-                "error": "Falha ao cadastrar usuário"
+                "error": "Falha ao atualizar usuário"
             })),
         );
     };
 
-    (
-        StatusCode::OK,
-        Json(json!({
-            "id": create_resume_result.last_insert_id
-        })),
-    )
+    (StatusCode::OK, Json(json!({})))
 }
