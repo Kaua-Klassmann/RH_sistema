@@ -40,6 +40,34 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Resume::Observation).text().not_null())
                     .to_owned(),
             )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .name("idx-resume-interview_date")
+                    .table(Resume::Table)
+                    .col(Resume::InterviewDate)
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_index(
+                Index::create()
+                    .name("idx-resume-cpf")
+                    .table(Resume::Table)
+                    .col(Resume::Cpf)
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_index(
+                Index::create()
+                    .name("idx-resume-name")
+                    .table(Resume::Table)
+                    .col(Resume::Name)
+                    .to_owned(),
+            )
             .await
     }
 
