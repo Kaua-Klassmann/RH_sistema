@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
+use deunicode::deunicode;
 use sea_orm::{ActiveValue::Set, DerivePartialModel, EntityTrait, FromQueryResult};
 use serde_json::json;
 use tokio::{fs, io::AsyncWriteExt};
@@ -85,7 +86,7 @@ pub async fn upload(
             );
         };
 
-        let mut filename = resume.name.replace(" ", "_").to_lowercase();
+        let mut filename = deunicode(&resume.name).replace(" ", "_").to_lowercase();
         filename.push_str(&format!("-{}.{}", resume.cpf, extension));
 
         let mut file = fs::File::create(format!("./uploads/resume/{}", filename))
