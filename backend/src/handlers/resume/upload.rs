@@ -4,11 +4,19 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use sea_orm::{ActiveValue::Set, EntityTrait};
+use sea_orm::{ActiveValue::Set, DerivePartialModel, EntityTrait, FromQueryResult};
 use serde_json::json;
 use tokio::{fs, io::AsyncWriteExt};
 
 use crate::{entities::resume, jwt::JwtClaims, state::AppState};
+
+#[derive(FromQueryResult, DerivePartialModel)]
+#[sea_orm(entity = "resume::Entity")]
+struct PartialResume {
+    name: String,
+    cpf: String,
+    attachment: Option<String>,
+}
 
 pub async fn upload(
     State(state): State<AppState>,
@@ -32,7 +40,11 @@ pub async fn upload(
             );
         }
 
-        let Ok(resume_option) = resume::Entity::find_by_id(resume_id).one(db).await else {
+        let Ok(resume_option) = resume::Entity::find_by_id(resume_id)
+            .into_partial_model::<PartialResume>()
+            .one(db)
+            .await
+        else {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(json!({
@@ -59,7 +71,24 @@ pub async fn upload(
             );
         }
 
-        let mut file = fs::File::create(format!("./uploads/resume/{}", field.file_name().unwrap()))
+        let filename = field.file_name().map(|f| f.to_owned()).unwrap();
+
+        let Some(extension) = std::path::Path::new(&filename)
+            .extension()
+            .and_then(|f| f.to_str())
+        else {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({
+                    "error": "Falha ao salvar currículo"
+                })),
+            );
+        };
+
+        let mut filename = resume.name.replace(" ", "_").to_lowercase();
+        filename.push_str(&format!("-{}.{}", resume.cpf, extension));
+
+        let mut file = fs::File::create(format!("./uploads/resume/{}", filename))
             .await
             .unwrap();
 
@@ -78,7 +107,7 @@ pub async fn upload(
 
         let resume = resume::ActiveModel {
             id: Set(resume_id),
-            attachment: Set(Some(field.file_name().unwrap().to_string())),
+            attachment: Set(Some(filename)),
             ..Default::default()
         };
 
