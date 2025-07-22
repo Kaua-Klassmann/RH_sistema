@@ -45,6 +45,15 @@ pub async fn list(
 ) -> impl IntoResponse {
     let db = &*state.db_conn;
 
+    if page == 0 {
+        return (
+            StatusCode::UNPROCESSABLE_ENTITY,
+            Json(json!({
+                "error": "Estrutura inválida"
+            })),
+        );
+    }
+
     let mut condition = Condition::all().add(resume::Column::Attachment.is_not_null());
     let mut order_col = resume::Column::Id;
     let mut order_ord = Order::Desc;
