@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use chrono::{Days, Utc};
+use chrono::{Days, Local};
 use sea_orm::{ActiveValue::Set, EntityTrait, PaginatorTrait, prelude::DateTime};
 use serde::Deserialize;
 use serde_json::json;
@@ -46,8 +46,8 @@ pub async fn edit(
     }
 
     if payload.interview_date.is_some() {
-        let now = Utc::now()
-            .naive_utc()
+        let now = Local::now()
+            .naive_local()
             .checked_sub_days(Days::new(1))
             .unwrap();
 

@@ -1,5 +1,5 @@
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
-use chrono::{Days, Utc};
+use chrono::{Days, Local};
 use sea_orm::{
     ActiveValue::{NotSet, Set},
     ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter,
@@ -43,8 +43,8 @@ pub async fn create(
     }
 
     if payload.interview_date.is_some() {
-        let now = Utc::now()
-            .naive_utc()
+        let now = Local::now()
+            .naive_local()
             .checked_sub_days(Days::new(1))
             .unwrap();
 
