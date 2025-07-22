@@ -5,7 +5,7 @@ use axum::{
     response::IntoResponse,
 };
 use chrono::{Days, Utc};
-use sea_orm::{ActiveValue::Set, EntityTrait, prelude::DateTime};
+use sea_orm::{ActiveValue::Set, EntityTrait, PaginatorTrait, prelude::DateTime};
 use serde::Deserialize;
 use serde_json::json;
 use validator::Validate;
@@ -63,7 +63,7 @@ pub async fn edit(
 
     let db = &*state.db_conn;
 
-    let Ok(resume_option) = resume::Entity::find_by_id(resume_id).one(db).await else {
+    let Ok(resume_exists) = resume::Entity::find_by_id(resume_id).count(db).await else {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({
@@ -72,7 +72,7 @@ pub async fn edit(
         );
     };
 
-    if resume_option.is_none() {
+    if resume_exists == 0 {
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({
