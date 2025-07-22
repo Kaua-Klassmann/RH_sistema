@@ -4,6 +4,7 @@ pub struct AppConfig {
     pub port: u32,
     pub user: String,
     pub password: String,
+    pub backend_url: String,
 }
 
 static APP_CONFIG: OnceLock<AppConfig> = OnceLock::new();
@@ -16,11 +17,13 @@ pub fn get_app_config() -> &'static AppConfig {
             .expect("APP_PORT needs be a number");
         let user = env::var("APP_USER").expect("APP_USER not found on .env");
         let password = env::var("APP_PASSWORD").expect("APP_PASSWORD not found on .env");
+        let backend_url = env::var("BACKEND_URL").expect("BACKEND_URL not found on .env");
 
         AppConfig {
             port,
             user,
             password,
+            backend_url,
         }
     })
 }
