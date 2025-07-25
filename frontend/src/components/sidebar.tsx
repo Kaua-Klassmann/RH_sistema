@@ -3,8 +3,13 @@ import { SidebarInset, SidebarProvider, SidebarTrigger, Sidebar, SidebarContent,
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 import LogoffButton from "./logoff-button";
+import { Separator } from "./ui/separator";
 
-export default function AppSidebar({ className, children, ...props }: React.ComponentProps<"div">) {
+interface AppSidebarProps extends React.ComponentProps<"div"> {
+  page: string
+}
+
+export default function AppSidebar({ className, children, page, ...props }: AppSidebarProps) {
     const data = [
         {
             title: "Cadastrar currículo",
@@ -37,10 +42,14 @@ export default function AppSidebar({ className, children, ...props }: React.Comp
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
-                <header className="p-2">
+                <header className="h-[8dvh] px-3 flex flex-row items-center">
                     <SidebarTrigger className="-ml-1"/>
+                    <Separator orientation="vertical" className="ml-2 mr-4 data-[orientation=vertical]:h-4"/>
+                    <h1 className="text-base font-medium">{ page }</h1>
                 </header>
-                { children }
+                <div className="h-[92dvh]">
+                    { children }
+                </div>
             </SidebarInset>
         </SidebarProvider>
     )
