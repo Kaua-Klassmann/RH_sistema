@@ -1,6 +1,6 @@
 use axum::{
     Json,
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
 };
@@ -41,7 +41,7 @@ pub async fn list(
     State(state): State<AppState>,
     _: JwtClaims,
     Path(page): Path<u16>,
-    Json(payload): Json<Payload>,
+    Query(payload): Query<Payload>,
 ) -> impl IntoResponse {
     let db = &*state.db_conn;
 
