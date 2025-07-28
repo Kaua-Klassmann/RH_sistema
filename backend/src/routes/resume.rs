@@ -8,6 +8,7 @@ use crate::{handlers, state::AppState};
 pub(super) fn configure_routes() -> Router<AppState> {
     Router::new()
         .route("/create", post(handlers::resume::create))
+        .route("/pages", get(handlers::resume::pages))
         .route("/list/{page}", get(handlers::resume::list))
         .route("/{resume_id}/view", get(handlers::resume::view))
         .route("/{resume_id}/edit", put(handlers::resume::edit))

@@ -13,6 +13,9 @@ pub use hire::hire;
 mod list;
 pub use list::list;
 
+mod pages;
+pub use pages::pages;
+
 mod preview;
 pub use preview::preview;
 
