@@ -1,8 +1,14 @@
-import { cookies } from "next/headers";
+"use client"
+
 import { TableBody, TableCell, TableRow } from "./ui/table"
 import TableCheckBox from "./table-checkbox";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import TableDropdownMenu from "./table-dropdown-menu";
 
-const backend_url = process.env.backend_url;
+interface TableBodyResumeProps extends React.ComponentProps<"tbody"> {
+    page: number
+}
 
 type Resume = {
   id: number;
@@ -13,27 +19,23 @@ type Resume = {
   interview_date: string;
 };
 
-async function getResumes() {
-    const token = (await cookies()).get("token")?.value;
+export default function TableBodyResume({ page, ...props }: TableBodyResumeProps) {
+    const [resumes, setResumes] = useState([] as Resume[]);
 
-    const response = await fetch(`${backend_url}/resume/list/1`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            "search": "",
-            "id_sector": 0,
-            "uninterviewed": false
+    const router = useRouter();
+
+    useEffect(() => {
+        fetch(`/api/resume/list?page=${page}`, {
+            method: "GET"
         })
-    });
-
-    return (await response.json()).resumes
-}
-
-export default async function TableBodyResume({ ...props }) {
-    const resumes: Resume[] = await getResumes();
+        .then(async (res) => {
+            if (res.status === 401) router.push("/login");
+            if (res.ok) {
+                setResumes((await res.json()).resumes);
+            }
+        })
+        .catch(() => setResumes([]));
+    }, [page, router]);
 
     return (
         <TableBody {...props}>
@@ -42,30 +44,32 @@ export default async function TableBodyResume({ ...props }) {
                     <TableCell className="py-0 text-center">
                         <TableCheckBox id={resume.id} hired={resume.hired}/>
                     </TableCell>
-                    <TableCell className="py-0">{ resume.name }</TableCell>
-                    <TableCell className="py-0">
+                    <TableCell className="py-0 min-w-45 max-w-45 truncate">{ resume.name }</TableCell>
+                    <TableCell className="py-0 min-w-30 max-w-30">
                         { resume.cpf.slice(0, 3) + "."
                         + resume.cpf.slice(3, 6) + "." + resume.cpf.slice(6, 9)
                         + "-" + resume.cpf.slice(9)}
                     </TableCell>
-                    <TableCell className="py-0">{ resume.sector }</TableCell>
-                    <TableCell className="py-0">
+                    <TableCell className="py-0 min-w-25 max-w-25">{ resume.sector }</TableCell>
+                    <TableCell className="py-0 min-w-34 max-w-34">
                         { resume.interview_date.slice(8, 10) + "/"
                         + resume.interview_date.slice(5, 7)  + "/"
                         + resume.interview_date.slice(0, 4) + " - "
                         + resume.interview_date.slice(11, 16)}
                         </TableCell>
-                    <TableCell className="py-0">...</TableCell>
+                    <TableCell className="min-w-10 max-w-10 p-0">
+                        <TableDropdownMenu id={resume.id}/>
+                    </TableCell>
                 </TableRow>
             ))}
             { resumes.length < 10 && Array.from({ length: 10 - resumes.length }, (_, i) => i).map(i => (
                 <TableRow key={i} className="h-1/10">
-                    <TableCell className="py-0"></TableCell>
-                    <TableCell className="py-0"></TableCell>
-                    <TableCell className="py-0"></TableCell>
-                    <TableCell className="py-0"></TableCell>
-                    <TableCell className="py-0"></TableCell>
-                    <TableCell className="py-0"></TableCell>
+                    <TableCell className="py-0" />
+                    <TableCell className="py-0" />
+                    <TableCell className="py-0" />
+                    <TableCell className="py-0" />
+                    <TableCell className="py-0" />
+                    <TableCell className="py-0" />
                 </TableRow>
             ))}
         </TableBody>

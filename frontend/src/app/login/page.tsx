@@ -22,7 +22,7 @@ export default function Login() {
         if(user.length < 3 || password.length < 6) {
             toast.error("Campos inválidos")
             return;
-        } 
+        }
 
         const response = await fetch("/api/login", {
             method: "POST",
