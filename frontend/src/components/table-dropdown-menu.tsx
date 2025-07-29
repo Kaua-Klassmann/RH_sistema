@@ -14,7 +14,7 @@ export default function TableDropdownMenu({ id }: Props) {
             <DropdownMenuContent align="start">
                 <DropdownMenuGroup>
                     <DropdownMenuItem onClick={() => {
-                        window.open(`/api/resume/preview/${id}`, "_blank")
+                        window.open(`/resume/preview/${id}`, "_blank")
                     }}>Visualizar currículo</DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>

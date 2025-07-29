@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const backend_url = process.env.backend_url;
+const backend_url = process.env.BACKEND_URL;
 
 export async function GET(req: NextRequest) {
     const token = (await cookies()).get("token")?.value;
