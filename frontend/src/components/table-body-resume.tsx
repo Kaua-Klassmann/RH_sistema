@@ -50,7 +50,7 @@ export default function TableBodyResume({ page, ...props }: TableBodyResumeProps
                         + resume.cpf.slice(3, 6) + "." + resume.cpf.slice(6, 9)
                         + "-" + resume.cpf.slice(9)}
                     </TableCell>
-                    <TableCell className="py-0 min-w-25 max-w-25">{ resume.sector }</TableCell>
+                    <TableCell className="py-0 min-w-30 max-w-30 truncate">{ resume.sector }</TableCell>
                     <TableCell className="py-0 min-w-34 max-w-34">
                         { resume.interview_date.slice(8, 10) + "/"
                         + resume.interview_date.slice(5, 7)  + "/"
@@ -58,7 +58,7 @@ export default function TableBodyResume({ page, ...props }: TableBodyResumeProps
                         + resume.interview_date.slice(11, 16)}
                         </TableCell>
                     <TableCell className="min-w-10 max-w-10 p-0">
-                        <TableDropdownMenu id={resume.id}/>
+                        <TableDropdownMenu resumeId={resume.id} className="float-right px-2"/>
                     </TableCell>
                 </TableRow>
             ))}

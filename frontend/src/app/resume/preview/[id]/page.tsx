@@ -8,8 +8,6 @@ export default async function Preview({
 }: { params: Promise<{ id: number}> }) {
     const token = (await cookies()).get("token")?.value;
     const { id } = await params;
-
-    console.log(id)
     
     const response = await fetch(`${backend_url}/resume/${id}/preview`, {
         method: "GET",

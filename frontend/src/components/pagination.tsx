@@ -1,6 +1,6 @@
 "use client"
 
-import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react";
+import { ChevronLeft, ChevronsLeft, ChevronsRight, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -77,16 +77,16 @@ export default function Pagination({ page, setPage }: PaginationProps) {
     return (
         <div className="w-full py-2 flex flex-row justify-center gap-2">
             <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={setMinPage} disabled={isLoading}>
-                <IconChevronsLeft />
+                <ChevronsLeft />
             </Button>
             <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={decreasePage} disabled={isLoading}>
-                <IconChevronLeft />
+                <ChevronLeft />
             </Button>
             <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={incrementPage} disabled={isLoading}>
-                <IconChevronRight />
+                <ChevronRight />
             </Button>
             <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={setMaxPage} disabled={isLoading}>
-                <IconChevronsRight />
+                <ChevronsRight />
             </Button>
         </div>
     )

@@ -1,15 +1,20 @@
+"use client"
+
 import { cn } from "@/lib/utils";
 import { SidebarInset, SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarMenuItem, SidebarMenuButton, SidebarMenu, SidebarRail } from "./ui/sidebar";
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 import LogoffButton from "./logoff-button";
 import { Separator } from "./ui/separator";
+import { useState } from "react";
 
 interface AppSidebarProps extends React.ComponentProps<"div"> {
   page: string
 }
 
 export default function AppSidebar({ className, children, page, ...props }: AppSidebarProps) {
+    const [open, setOpen] = useState(false);
+
     const data = [
         {
             title: "Cadastrar currículo",
@@ -22,7 +27,7 @@ export default function AppSidebar({ className, children, page, ...props }: AppS
     ];
 
     return (
-        <SidebarProvider className={cn(className)}>
+        <SidebarProvider className={cn(className)} open={open} onOpenChange={setOpen}>
             <Sidebar {...props}>
                 <SidebarContent className="py-2 px-1 flex flex-col justify-between">
                     <SidebarMenu>
