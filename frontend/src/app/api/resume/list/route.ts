@@ -8,8 +8,11 @@ export async function GET(req: NextRequest) {
 
     const searchParams = req.nextUrl.searchParams;
     const page = searchParams.get("page") ?? 1;
+    const search = searchParams.get("search") ?? "";
+    const sector = searchParams.get("sector") ?? 0;
+    const uninterviewed = searchParams.get("uninterviewed") ?? false;
 
-    const response = await fetch(`${backend_url}/resume/list/${page}?search=&id_sector=0&uninterviewed=false`, {
+    const response = await fetch(`${backend_url}/resume/list/${page}?search=${search}&id_sector=${sector}&uninterviewed=${uninterviewed}`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${token}`

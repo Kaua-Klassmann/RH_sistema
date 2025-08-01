@@ -7,7 +7,10 @@ import { useRouter } from "next/navigation";
 import TableDropdownMenu from "./table-dropdown-menu";
 
 interface TableBodyResumeProps extends React.ComponentProps<"tbody"> {
-    page: number
+    page: number,
+    search: string,
+    sector: number,
+    uninterviewed: boolean
 }
 
 type Resume = {
@@ -19,13 +22,13 @@ type Resume = {
   interview_date: string;
 };
 
-export default function TableBodyResume({ page, ...props }: TableBodyResumeProps) {
+export default function TableBodyResume({ page, search, sector, uninterviewed, ...props }: TableBodyResumeProps) {
     const [resumes, setResumes] = useState([] as Resume[]);
 
     const router = useRouter();
 
     useEffect(() => {
-        fetch(`/api/resume/list?page=${page}`, {
+        fetch(`/api/resume/list?page=${page}&search=${search}&sector=${sector}&uninterviewed=${uninterviewed}`, {
             method: "GET"
         })
         .then(async (res) => {
@@ -35,7 +38,7 @@ export default function TableBodyResume({ page, ...props }: TableBodyResumeProps
             }
         })
         .catch(() => setResumes([]));
-    }, [page, router]);
+    }, [page, search, sector, uninterviewed, router]);
 
     return (
         <TableBody {...props}>
