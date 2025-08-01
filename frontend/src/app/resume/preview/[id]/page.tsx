@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 const backend_url = process.env.BACKEND_URL;
 
@@ -7,9 +8,14 @@ export default async function Preview({
     params
 }: { params: Promise<{ id: number}> }) {
     const token = (await cookies()).get("token")?.value;
+
+    if(token == undefined) {
+        redirect("/login")
+    }
+
     const { id } = await params;
     
-    const response = await fetch(`${backend_url}/resume/${id}/preview`, {
+    const response = await fetch(`${backend_url}/resume/${id}/download`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${token}`
